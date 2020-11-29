@@ -1,4 +1,4 @@
-# scanner
+# Digital Number Scanning Application
 
 RUN:  mvn clean package
 
