@@ -1,5 +1,8 @@
 package scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,7 +20,10 @@ public class DigitalNumberParser {
     static String ILLEGAL_CHAR = "?";
     static String ILLEGAL_TEXT = "ILL";
 
+    private static Logger LOG = LoggerFactory.getLogger(DigitalNumberParser.class);
+     
     public String[] parseFile(String filename) throws IOException {
+        LOG.info("parseFile {}", filename);
         List<String> lines = Files.lines(Paths.get(getFile(filename).toURI())).collect(toList()); 
         return parse(lines.toArray(String[]::new));
     }
@@ -33,6 +39,8 @@ public class DigitalNumberParser {
     
     public String[] parse(String[] _lines) {
 
+        LOG.debug("parse {}", Arrays.toString(_lines));
+
         String[] lines = Arrays.stream(_lines).filter( e -> !e.isEmpty() ).toArray(String[]::new);
 
         if(lines.length% Digit.LINES != 0)
@@ -47,6 +55,8 @@ public class DigitalNumberParser {
     
     private String parseOne(String[] lines) {
 
+        LOG.debug("parseOne {}", Arrays.toString(lines));
+
         if(lines.length != Digit.LINES)
             throw new IllegalArgumentException(String.format("There must be exectly %d lines per number excluding blank lines", Digit.LINES));
 
@@ -59,6 +69,7 @@ public class DigitalNumberParser {
 
         for(String[] testDigit : testDigits) {
             try {
+                LOG.debug("parseInt {}", Arrays.toString(testDigit));
                 buf.append(Digit.parseInt(testDigit));
             } catch(NumberFormatException ex) {
                 buf.append(ILLEGAL_CHAR);
@@ -66,6 +77,9 @@ public class DigitalNumberParser {
         }
 
         String number = buf.toString();
+
+        LOG.debug("parseOne {} with result {}", Arrays.toString(lines), number);
+
         return isLegal(number) ? number + " " + ILLEGAL_TEXT : number;
     }
 
